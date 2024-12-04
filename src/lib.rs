@@ -202,7 +202,7 @@ pub use errors::UserAgentParserError;
 pub use models::*;
 use onig::Regex;
 use regexes::*;
-use yaml_rust::{Yaml, YamlLoader};
+use yaml_rust2::{Yaml, YamlLoader};
 
 #[derive(Debug)]
 pub struct UserAgentParser {
@@ -219,6 +219,13 @@ impl UserAgentParser {
     #[inline]
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<UserAgentParser, UserAgentParserError> {
         let yaml = fs::read_to_string(path)?;
+
+        Self::from_str(yaml)
+    }
+
+    /// Read the list of regular expressions (YAML data) from bytes to create a `UserAgentParser` instance.
+    pub fn from_bytes(bytes: &[u8]) -> Result<UserAgentParser, UserAgentParserError> {
+        let yaml = unsafe { String::from_utf8_unchecked(bytes.to_vec()) };
 
         Self::from_str(yaml)
     }
